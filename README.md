@@ -5,9 +5,10 @@ cloud-proxy creates multiple cloud instances and then starts local socks proxies
 This tool will deploy as many droplets as you desire, and will make a best effort to delete them after use. However, you are ultimately going to pay the bill for these droplets, and it is up to you, and you alone to ensure they actually get deleted.
 
 ### Install
-Download a compiled release [here](https://github.com/tomsteele/cloud-proxy/releases/latest).  
+Git clone it and do a `go build .`
 Download terraform [here](https://www.terraform.io/downloads.html).  
 Currently the only supported and tested OS is Linux:
+
 ```
 $ ./cloud-proxy
 ```
@@ -39,20 +40,20 @@ Usage of ./cloud-proxy:
 To use cloud-proxy with DO you will need to have a DO API token, you can get one [here](https://cloud.digitalocean.com/settings/api/tokens).
 To use cloud-proxy with AWS you will need to have an Access and Secret key.
 
-Next, ensure you have an SSH key saved on DO. On AWS your SSH key will need to be setup on each region you'd like to use. This is the key that SSH will authentication with. The DO API and cloud-proxy require you to provide the fingerprint of the key you would like to use. You can obtain the fingerprint using `ssh-keygen`. Please note that DO requires fingerprint keys in the MD5 format:
+###### DO
+
+Create an actually good SSH key with:
+
 ```
-$ ssh-keygen -lf ~/.ssh/id_rsa.pub -E MD5
+ssh-keygen -t ed25519 -a 100 -f ~/.ssh/id_rsa
 ```
 
-If your key requires a passphrase, you will need to use ssh-agent:
-```
-$ eval `ssh-agent -s`
-$ ssh-add ~/.ssh/id_rsa
-```
+Add this key to DO. Following it's addition, you will be able to grab the MD5 associated with the key. Otherwise do
 
-The AWS API only requires the name of the SSH key you previously imported into each region.
-
-Finally, you'll need to create a `secrets.tfvars` file that will contain the API tokens and information for SSH. The file should look like the following:
+```
+ssh-keygen -l -E md5 -f ~/.ssh/{{filename}}
+```
+Create a `secrets.tfvars` file that will contain the API tokens and information for SSH. The file should look like the following:
 ```
 do_token = "YOUR_DO_TOKEN"
 do_ssh_fingerprint = "YOUR:SSH:FINGERPRINT"
@@ -66,11 +67,14 @@ Now you may create some proxies:
 $ ./cloud-proxy -do -aws -count 15
 ```
 
+###### TIPS and Troubleshooting
+
+* Do in a screen session 
+* Double check that your has proper permissions in ~/.ssh by `chmod 400`
+* If you are seeing failed to connect or something: Try to connecting to a provisioned server with your key quickly, killing everything, and trying again. I am not really sure why this works.
+
 When you are finished using your proxies, use CTRL-C to interrupt the program, cloud-proxy will catch the interrupt and delete the instances.
 
-cloud-proxy will output a proxy list for proxychains and [socksd](https://github.com/eahydra/socks/tree/master/cmd/socksd). proxychains can be configured to iterate over a random proxy for each connection by uncommenting `random_chain`, you should also comment out `string-chain`, which is the default. You will also need to uncomment `chain_len` and set it to `1`.
-
-socksd can be helpful for programs that can accept a socks proxy, but may not work nicely with proxychains. socksd will listen as a socks proxy, and can be configured to use a set of upstream proxies, which it will iterate through in a round-robin manner. Follow the instructions in the README linked above, as it is self explanitory.
 
 ### Example Output
 ```
