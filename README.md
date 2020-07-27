@@ -1,3 +1,5 @@
+# REWRITE THIS :)
+
 # cloud-proxy
 cloud-proxy creates multiple cloud instances and then starts local socks proxies using SSH. After exiting, the droplets are deleted.
 
@@ -6,7 +8,9 @@ This tool will deploy as many droplets as you desire, and will make a best effor
 
 ### Install
 Git clone it and do a `go build .`
+
 Download terraform [here](https://www.terraform.io/downloads.html).  
+
 Currently the only supported and tested OS is Linux:
 
 ```
