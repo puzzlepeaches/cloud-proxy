@@ -10,7 +10,7 @@ provider "digitalocean" {
 
 {{range .}}
 resource "digitalocean_droplet" "{{.Name}}" {
-  image  = "ubuntu-14-04-x64"
+  image  = "ubuntu-16-04-x64"
   name   = "{{.Name}}"
   region = "{{.Region}}"
   size   = "512mb"
